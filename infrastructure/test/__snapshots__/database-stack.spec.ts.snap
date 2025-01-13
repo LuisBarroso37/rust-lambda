@@ -1,0 +1,97 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Access Stack Snapshot Test 1`] = `
+{
+  "Outputs": {
+    "TableArn": {
+      "Description": "The ARN of the DynamoDB table",
+      "Export": {
+        "Name": "Table-TableArn",
+      },
+      "Value": {
+        "Fn::GetAtt": [
+          "TableCD117FA1",
+          "Arn",
+        ],
+      },
+    },
+    "TableName": {
+      "Description": "The name of the DynamoDB table",
+      "Export": {
+        "Name": "Table-TableName",
+      },
+      "Value": {
+        "Ref": "TableCD117FA1",
+      },
+    },
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "TableCD117FA1": {
+      "DeletionPolicy": "RetainExceptOnCreate",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "#p",
+            "AttributeType": "S",
+          },
+          {
+            "AttributeName": "#s",
+            "AttributeType": "S",
+          },
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "DeletionProtectionEnabled": true,
+        "KeySchema": [
+          {
+            "AttributeName": "#p",
+            "KeyType": "HASH",
+          },
+          {
+            "AttributeName": "#s",
+            "KeyType": "RANGE",
+          },
+        ],
+        "PointInTimeRecoverySpecification": {
+          "PointInTimeRecoveryEnabled": true,
+        },
+      },
+      "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;

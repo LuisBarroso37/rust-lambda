@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+members = [
+    "get_all",
+    "insert", 
+    "shared",
+]
