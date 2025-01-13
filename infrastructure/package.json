@@ -12,9 +12,8 @@
 		"lint": "eslint . --ext .ts",
 		"synth": "cdk synth",
 		"deploy": "npm run deploy:databaseStack && npm run deploy:rustLambdaStack",
-		"deploy:databaseStack": "cdk deploy DatabaseStack",
-		"deploy:rustLambdaStack": "cdk deploy RustLambdaStack",
-		"deploy:githubActionsRoleStack": "npx ts-node --prefer-ts-exts bin/github-actions-role.ts"
+		"deploy:databaseStack": "cdk deploy DatabaseStack -- --verbose --ci --require-approval never",
+		"deploy:rustLambdaStack": "cdk deploy RustLambdaStack -- --verbose --ci --require-approval never"
 	},
 	"devDependencies": {
 		"@types/jest": "^29.5.12",
