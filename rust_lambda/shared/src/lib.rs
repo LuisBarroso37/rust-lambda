@@ -4,5 +4,5 @@ use aws_sdk_dynamodb::Client;
 pub async fn get_dynamodb_client() -> Client {
     let config = aws_config::load_defaults(BehaviorVersion::latest()).await;
 
-    return Client::new(&config);
+    Client::new(&config)
 }

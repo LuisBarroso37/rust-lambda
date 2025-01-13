@@ -59,8 +59,8 @@ async fn main() -> Result<(), Error> {
 
 pub async fn add_item(client: &Client, item: Item, table_name: &str) -> Result<(), Error> {
     let user_id = Uuid::new_v4();
-    let primary_key = format!("u#{user_id}", user_id = user_id.to_string());
-    let sort_key = format!("u#{user_id}", user_id = user_id.to_string());
+    let primary_key = format!("u#{user_id}", user_id = user_id);
+    let sort_key = format!("u#{user_id}", user_id = user_id);
 
     let primary_key_av = to_attribute_value(primary_key)?;
     let sort_key_av = to_attribute_value(sort_key)?;
