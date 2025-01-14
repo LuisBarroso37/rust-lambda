@@ -112,6 +112,7 @@ exports[`Access Stack Snapshot Test 1`] = `
               "Action": [
                 "dynamodb:Query",
                 "dynamodb:GetItem",
+                "dynamodb:Scan",
               ],
               "Effect": "Allow",
               "Resource": [
@@ -241,6 +242,7 @@ exports[`Access Stack Snapshot Test 1`] = `
               "Action": [
                 "dynamodb:Query",
                 "dynamodb:GetItem",
+                "dynamodb:Scan",
                 "dynamodb:PutItem",
                 "dynamodb:UpdateItem",
               ],

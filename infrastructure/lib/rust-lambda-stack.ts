@@ -18,13 +18,14 @@ export class RustLambdaStack extends Stack {
 		};
 
 		const dynamodbReadPolicy = new PolicyStatement({
-			actions: ["dynamodb:Query", "dynamodb:GetItem"],
+			actions: ["dynamodb:Query", "dynamodb:GetItem", "dynamodb:Scan"],
 			resources: [tableArn, `${tableArn}/index/*`],
 		});
 		const dynamodbReadWritePolicy = new PolicyStatement({
 			actions: [
 				"dynamodb:Query",
 				"dynamodb:GetItem",
+				"dynamodb:Scan",
 				"dynamodb:PutItem",
 				"dynamodb:UpdateItem",
 			],

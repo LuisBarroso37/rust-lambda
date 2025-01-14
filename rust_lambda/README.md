@@ -46,3 +46,9 @@ curl -v 'https://kpaoxlpgpe52tribhlba4cjala0djboz.lambda-url.eu-west-1.on.aws' \
 -H 'content-type: application/json' \
 -d '{"username": "test.user", "first_name": "test", "last_name": "user", "age": 30}'
 ```
+
+GetAll function:
+
+```
+curl https://yn7vpyyp7gyq4xfsoamdpcqc7e0obdov.lambda-url.eu-west-1.on.aws
+```

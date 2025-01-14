@@ -15,13 +15,12 @@ pub struct Item {
 
 /// You can see more examples in Runtime's repository:
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
+#[tracing::instrument(skip(db_client))]
 async fn handle_request(db_client: &Client, event: Request) -> Result<Response<Body>, Error> {
     let table_name = get_required_env_variable("TABLE_NAME");
 
     let body = event.body();
     let s = std::str::from_utf8(body).expect("invalid utf-8 sequence");
-
-    tracing::info!(payload = %s, "JSON Payload received");
 
     let item = match serde_json::from_str::<Item>(s) {
         Ok(item) => item,
@@ -60,6 +59,7 @@ async fn main() -> Result<(), Error> {
     .await
 }
 
+#[tracing::instrument(skip(client, table_name))]
 pub async fn add_item(client: &Client, table_name: &str, item: Item) -> Result<(), Error> {
     let user_id = Uuid::new_v4();
     let primary_key = format!("u#{user_id}", user_id = user_id);
@@ -81,8 +81,6 @@ pub async fn add_item(client: &Client, table_name: &str, item: Item) -> Result<(
         .item("first_name", first_name_av)
         .item("last_name", last_name_av)
         .item("age", age_av);
-
-    tracing::info!("adding item to DynamoDB");
 
     request.send().await?;
 
