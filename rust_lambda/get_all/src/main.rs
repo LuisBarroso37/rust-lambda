@@ -14,8 +14,11 @@ pub struct Item {
 
 /// You can see more examples in Runtime's repository:
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
+#[tracing::instrument(skip(db_client))]
 async fn handle_request(db_client: &Client) -> Result<Response<Body>, Error> {
+    tracing::info!("Received request to get all items");
     let table_name = get_required_env_variable("TABLE_NAME");
+
     let items = get_all(db_client, &table_name).await?;
 
     let j = serde_json::to_string(&items)?;
@@ -41,9 +44,12 @@ async fn main() -> Result<(), Error> {
     .await
 }
 
+#[tracing::instrument(skip(client, table_name))]
 pub async fn get_all(client: &Client, table_name: &str) -> Result<Vec<Item>, Error> {
     let mut last_evaluated_key = None;
     let mut items_array: Vec<Item> = Vec::new();
+
+    tracing::info!("Getting all items from the table");
 
     loop {
         let request = client
@@ -67,7 +73,10 @@ pub async fn get_all(client: &Client, table_name: &str) -> Result<Vec<Item>, Err
         }
     }
 
-    tracing::info!("Found {:?} items in total", items_array.len());
+    tracing::info!(
+        "Found {number_of_items} items in total",
+        number_of_items = items_array.len()
+    );
 
     Ok(items_array)
 }
