@@ -36,3 +36,13 @@ Note: Use flag --arm64 if you want to use Graviton processors on AWS Lambda
 ## Deploy lambda function
 
 cargo lambda deploy
+
+## Test function urls
+
+Insert function:
+
+```
+curl -v 'https://kpaoxlpgpe52tribhlba4cjala0djboz.lambda-url.eu-west-1.on.aws' \
+-H 'content-type: application/json' \
+-d '{"username": "test.user", "first_name": "test", "last_name": "user", "age": 30}'
+```

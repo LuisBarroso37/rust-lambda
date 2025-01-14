@@ -6,3 +6,5 @@ edition = "2021"
 [dependencies]
 aws-sdk-dynamodb = "1.57.0"
 aws-config = "1.5.12"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["json"] }
