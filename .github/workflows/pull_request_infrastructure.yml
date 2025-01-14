@@ -1,0 +1,28 @@
+name: Infrastructure Pull Request Workflow
+
+on:
+  pull_request:
+    paths:
+      - "infrastructure/**"
+      - ".github/workflows/pull_request_infrastructure.yml"
+      - ".github/workflows/general.yml"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infrastructure
+    concurrency:
+      group: infrastructure-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Install Node JS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm ci
+      - name: Build infrastructure
+        run: npm run build

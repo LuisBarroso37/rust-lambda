@@ -43,6 +43,13 @@ exports[`Access Stack Snapshot Test 1`] = `
           },
           "S3Key": "PLACEHOLDER",
         },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Fn::ImportValue": "Table-TableName",
+            },
+          },
+        },
         "Handler": "bootstrap",
         "Role": {
           "Fn::GetAtt": [
@@ -164,6 +171,13 @@ exports[`Access Stack Snapshot Test 1`] = `
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
           "S3Key": "PLACEHOLDER",
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Fn::ImportValue": "Table-TableName",
+            },
+          },
         },
         "Handler": "bootstrap",
         "Role": {

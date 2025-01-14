@@ -24,4 +24,4 @@ const app = new App();
 new GithubActionsRoleStack(app, "GithubActionsRoleStack", {});
 ```
 
-AWS_PROFILE=<your-profile> npx cdk deploy GithubActionsRoleStack --parameters RepositoryOwner=<your-org-or-your-profile> --parameters GitHubRepository=<your-repo>
+AWS_PROFILE=<your-profile> npx cdk deploy GithubActionsRoleStack --parameters RepositoryOwner=<your-org-or-your-profile-name> --parameters GitHubRepository=<your-repo-name>

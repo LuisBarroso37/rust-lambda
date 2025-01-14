@@ -2,10 +2,10 @@ use aws_sdk_dynamodb::Client;
 use lambda_http::{run, service_fn, tracing, Body, Error, Request, Response};
 use serde::{Deserialize, Serialize};
 use serde_dynamo::to_attribute_value;
-use shared::get_dynamodb_client;
+use shared::get_required_env_variable;
 use uuid::Uuid;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Item {
     pub username: String,
     pub first_name: String,
@@ -16,6 +16,8 @@ pub struct Item {
 /// You can see more examples in Runtime's repository:
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
 async fn handle_request(db_client: &Client, event: Request) -> Result<Response<Body>, Error> {
+    let table_name = get_required_env_variable("TABLE_NAME");
+
     let body = event.body();
     let s = std::str::from_utf8(body).expect("invalid utf-8 sequence");
 
@@ -26,21 +28,21 @@ async fn handle_request(db_client: &Client, event: Request) -> Result<Response<B
         Err(err) => {
             let resp = Response::builder()
                 .status(400)
-                .header("content-type", "text/html")
+                .header("content-type", "application/json")
                 .body(err.to_string().into())
                 .map_err(Box::new)?;
             return Ok(resp);
         }
     };
 
-    add_item(db_client, item.clone(), "lambda_dyno_example").await?;
+    add_item(db_client, &table_name, item.clone()).await?;
 
-    let j = serde_json::to_string(&item)?;
+    let json = serde_json::to_string(&item)?;
 
     let resp = Response::builder()
         .status(200)
         .header("content-type", "application/json")
-        .body(j.into())
+        .body(json.into())
         .map_err(Box::new)?;
     Ok(resp)
 }
@@ -49,7 +51,8 @@ async fn handle_request(db_client: &Client, event: Request) -> Result<Response<B
 async fn main() -> Result<(), Error> {
     tracing::init_default_subscriber();
 
-    let client = get_dynamodb_client().await;
+    let aws_config = shared::get_aws_config().await;
+    let client = aws_sdk_dynamodb::Client::new(&aws_config);
 
     run(service_fn(|event: Request| async {
         handle_request(&client, event).await
@@ -57,10 +60,10 @@ async fn main() -> Result<(), Error> {
     .await
 }
 
-pub async fn add_item(client: &Client, item: Item, table_name: &str) -> Result<(), Error> {
+pub async fn add_item(client: &Client, table_name: &str, item: Item) -> Result<(), Error> {
     let user_id = Uuid::new_v4();
-    let primary_key = format!("u#{user_id}", user_id = user_id.to_string());
-    let sort_key = format!("u#{user_id}", user_id = user_id.to_string());
+    let primary_key = format!("u#{user_id}", user_id = user_id);
+    let sort_key = format!("u#{user_id}", user_id = user_id);
 
     let primary_key_av = to_attribute_value(primary_key)?;
     let sort_key_av = to_attribute_value(sort_key)?;
@@ -84,4 +87,54 @@ pub async fn add_item(client: &Client, item: Item, table_name: &str) -> Result<(
     request.send().await?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use lambda_http::http::Request;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn it_successfully_adds_item_to_database() {
+        let table_name = "DatabaseStack-Table";
+        std::env::set_var("TABLE_NAME", table_name);
+
+        let test_dynamodb_config = shared::test::get_dynamodb_test_config().await;
+        let dynamodb_client = aws_sdk_dynamodb::Client::new(&test_dynamodb_config);
+
+        shared::test::create_table(&dynamodb_client, table_name)
+            .await
+            .expect("Table creation should succeed");
+
+        let item = Item {
+            username: "test.user".to_string(),
+            first_name: "test".to_string(),
+            last_name: "user".to_string(),
+            age: 30,
+        };
+
+        let body = serde_json::to_string(&item).expect("The item should be serializable");
+
+        let request = Request::builder()
+            .method("POST")
+            .body(Body::Text(body))
+            .unwrap();
+
+        let result = handle_request(&dynamodb_client, request)
+            .await
+            .expect("The request should succeed");
+
+        let s = std::str::from_utf8(result.body()).expect("Invalid utf-8 sequence");
+
+        let response =
+            serde_json::from_str::<Item>(s).expect("The response body should be a valid item");
+
+        assert!(result.status().is_success());
+        assert_eq!(response, item);
+
+        shared::test::delete_table(&dynamodb_client, table_name)
+            .await
+            .expect("Table deletion should succeed");
+    }
 }

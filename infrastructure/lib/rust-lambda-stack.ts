@@ -11,6 +11,11 @@ export class RustLambdaStack extends Stack {
 		super(scope, id, props);
 
 		const tableArn = Fn.importValue("Table-TableArn");
+		const tableName = Fn.importValue("Table-TableName");
+
+		const environment = {
+			TABLE_NAME: tableName,
+		};
 
 		const dynamodbReadPolicy = new PolicyStatement({
 			actions: ["dynamodb:Query", "dynamodb:GetItem"],
@@ -31,6 +36,7 @@ export class RustLambdaStack extends Stack {
 			binaryName: "get_all",
 			runtime: "provided.al2023",
 			architecture: Architecture.ARM_64,
+			environment,
 		});
 
 		getAllFunction.addToRolePolicy(dynamodbReadPolicy);
@@ -46,6 +52,7 @@ export class RustLambdaStack extends Stack {
 			binaryName: "insert",
 			runtime: "provided.al2023",
 			architecture: Architecture.ARM_64,
+			environment,
 		});
 
 		insertFunction.addToRolePolicy(dynamodbReadWritePolicy);

@@ -2,21 +2,21 @@ use aws_sdk_dynamodb::Client;
 use lambda_http::{run, service_fn, tracing, Body, Error, Request, Response};
 use serde::{Deserialize, Serialize};
 use serde_dynamo::aws_sdk_dynamodb_1::from_items;
-use shared::get_dynamodb_client;
+use shared::get_required_env_variable;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Item {
-    pub p_type: String,
-    pub age: String,
     pub username: String,
-    pub first: String,
-    pub last: String,
+    pub first_name: String,
+    pub last_name: String,
+    pub age: u8,
 }
 
 /// You can see more examples in Runtime's repository:
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
 async fn handle_request(db_client: &Client) -> Result<Response<Body>, Error> {
-    let items = get_all(db_client, "lambda_dyno_example").await?;
+    let table_name = get_required_env_variable("TABLE_NAME");
+    let items = get_all(db_client, &table_name).await?;
 
     let j = serde_json::to_string(&items)?;
 
@@ -32,7 +32,8 @@ async fn handle_request(db_client: &Client) -> Result<Response<Body>, Error> {
 async fn main() -> Result<(), Error> {
     tracing::init_default_subscriber();
 
-    let client = get_dynamodb_client().await;
+    let aws_config = shared::get_aws_config().await;
+    let client = aws_sdk_dynamodb::Client::new(&aws_config);
 
     run(service_fn(|_event: Request| async {
         handle_request(&client).await
