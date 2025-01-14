@@ -15,7 +15,7 @@ pub struct Item {
 
 /// You can see more examples in Runtime's repository:
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
-#[tracing::instrument(skip(db_client))]
+#[tracing::instrument(skip(db_client), level = "info")]
 async fn handle_request(db_client: &Client, event: Request) -> Result<Response<Body>, Error> {
     tracing::info!("Received request to add item");
     let table_name = get_required_env_variable("TABLE_NAME");
@@ -60,7 +60,7 @@ async fn main() -> Result<(), Error> {
     .await
 }
 
-#[tracing::instrument(skip(client, table_name))]
+#[tracing::instrument(skip(client, table_name), level = "info")]
 pub async fn add_item(client: &Client, table_name: &str, item: Item) -> Result<(), Error> {
     let user_id = Uuid::new_v4();
     let primary_key = format!("u#{user_id}", user_id = user_id);

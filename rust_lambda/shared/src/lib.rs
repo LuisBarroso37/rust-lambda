@@ -1,4 +1,5 @@
 use aws_config::{BehaviorVersion, Region, SdkConfig};
+use tracing_subscriber::fmt::format::FmtSpan;
 
 pub mod test;
 
@@ -22,9 +23,9 @@ pub fn init_tracing() {
     tracing_subscriber::fmt()
         .json()
         .with_max_level(tracing::Level::INFO)
-        .with_current_span(false)
+        .with_current_span(true)
         .with_ansi(false)
-        .with_target(true)
-        .flatten_event(true)
+        .with_target(false)
+        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .init();
 }
