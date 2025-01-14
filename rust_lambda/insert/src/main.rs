@@ -2,7 +2,7 @@ use aws_sdk_dynamodb::Client;
 use lambda_http::{run, service_fn, tracing, Body, Error, Request, Response};
 use serde::{Deserialize, Serialize};
 use serde_dynamo::to_attribute_value;
-use shared::get_required_env_variable;
+use shared::{get_required_env_variable, init_tracing};
 use uuid::Uuid;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -49,7 +49,7 @@ async fn handle_request(db_client: &Client, event: Request) -> Result<Response<B
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    tracing::init_default_subscriber();
+    init_tracing();
 
     let aws_config = shared::get_aws_config().await;
     let client = aws_sdk_dynamodb::Client::new(&aws_config);
