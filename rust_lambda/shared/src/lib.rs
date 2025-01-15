@@ -23,7 +23,7 @@ pub fn init_tracing() {
     tracing_subscriber::fmt()
         .json()
         .with_max_level(tracing::Level::INFO)
-        .with_current_span(true)
+        .with_current_span(false)
         .with_ansi(false)
         .with_target(false)
         .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)

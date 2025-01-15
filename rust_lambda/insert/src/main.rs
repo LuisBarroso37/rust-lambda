@@ -17,7 +17,6 @@ pub struct Item {
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
 #[tracing::instrument(skip(db_client), level = "info")]
 async fn handle_request(db_client: &Client, event: Request) -> Result<Response<Body>, Error> {
-    tracing::info!("Received request to add item");
     let table_name = get_required_env_variable("TABLE_NAME");
 
     let body = event.body();
@@ -66,8 +65,6 @@ pub async fn add_item(client: &Client, table_name: &str, item: Item) -> Result<(
     let primary_key = format!("u#{user_id}", user_id = user_id);
     let sort_key = format!("u#{user_id}", user_id = user_id);
 
-    tracing::info!("Adding item with {id} to the table", id = user_id);
-
     let primary_key_av = to_attribute_value(primary_key)?;
     let sort_key_av = to_attribute_value(sort_key)?;
     let user_av = to_attribute_value(item.username)?;
@@ -87,7 +84,6 @@ pub async fn add_item(client: &Client, table_name: &str, item: Item) -> Result<(
 
     request.send().await?;
 
-    tracing::info!("Item added successfully");
     Ok(())
 }
 

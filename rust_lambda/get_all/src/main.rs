@@ -16,7 +16,6 @@ pub struct Item {
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
 #[tracing::instrument(skip(db_client), level = "info")]
 async fn handle_request(db_client: &Client) -> Result<Response<Body>, Error> {
-    tracing::info!("Received request to get all items");
     let table_name = get_required_env_variable("TABLE_NAME");
 
     let items = get_all(db_client, &table_name).await?;
@@ -44,12 +43,10 @@ async fn main() -> Result<(), Error> {
     .await
 }
 
-#[tracing::instrument(skip(client, table_name), level = "info")]
+#[tracing::instrument(skip(client, table_name), level = "info", fields(records_found = tracing::field::Empty))]
 pub async fn get_all(client: &Client, table_name: &str) -> Result<Vec<Item>, Error> {
     let mut last_evaluated_key = None;
-    let mut items_array: Vec<Item> = Vec::new();
-
-    tracing::info!("Getting all items from the table");
+    let mut records: Vec<Item> = Vec::new();
 
     loop {
         let request = client
@@ -63,7 +60,7 @@ pub async fn get_all(client: &Client, table_name: &str) -> Result<Vec<Item>, Err
             let mut found_items: Vec<Item> = from_items(items)?;
             tracing::info!("Got {:?} items from DynamoDB", found_items.len());
 
-            items_array.append(&mut found_items);
+            records.append(&mut found_items);
         }
 
         last_evaluated_key = resp.last_evaluated_key;
@@ -73,10 +70,7 @@ pub async fn get_all(client: &Client, table_name: &str) -> Result<Vec<Item>, Err
         }
     }
 
-    tracing::info!(
-        "Found {number_of_items} items in total",
-        number_of_items = items_array.len()
-    );
+    tracing::Span::current().record("records_found", tracing::field::display(&records.len()));
 
-    Ok(items_array)
+    Ok(records)
 }
