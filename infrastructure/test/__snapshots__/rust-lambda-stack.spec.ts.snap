@@ -3,10 +3,26 @@
 exports[`Access Stack Snapshot Test 1`] = `
 {
   "Outputs": {
+    "DeleteFunctionUrl": {
+      "Value": {
+        "Fn::GetAtt": [
+          "DeleteFunctionFunctionUrl82E9C6E9",
+          "FunctionUrl",
+        ],
+      },
+    },
     "GetAllFunctionUrl": {
       "Value": {
         "Fn::GetAtt": [
           "GetAllFunctionFunctionUrl73FAD014",
+          "FunctionUrl",
+        ],
+      },
+    },
+    "GetByIdFunctionUrl": {
+      "Value": {
+        "Fn::GetAtt": [
+          "GetByIdFunctionFunctionUrlE832E604",
           "FunctionUrl",
         ],
       },
@@ -28,6 +44,138 @@ exports[`Access Stack Snapshot Test 1`] = `
     },
   },
   "Resources": {
+    "DeleteFunction9052F8B5": {
+      "DependsOn": [
+        "DeleteFunctionServiceRoleDefaultPolicy702B92CD",
+        "DeleteFunctionServiceRole092E9E58",
+      ],
+      "Properties": {
+        "Architectures": [
+          "arm64",
+        ],
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "PLACEHOLDER",
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Fn::ImportValue": "Table-TableName",
+            },
+          },
+        },
+        "Handler": "bootstrap",
+        "Role": {
+          "Fn::GetAtt": [
+            "DeleteFunctionServiceRole092E9E58",
+            "Arn",
+          ],
+        },
+        "Runtime": "provided.al2023",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "DeleteFunctionFunctionUrl82E9C6E9": {
+      "Properties": {
+        "AuthType": "NONE",
+        "TargetFunctionArn": {
+          "Fn::GetAtt": [
+            "DeleteFunction9052F8B5",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Url",
+    },
+    "DeleteFunctionServiceRole092E9E58": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "DeleteFunctionServiceRoleDefaultPolicy702B92CD": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::ImportValue": "Table-TableArn",
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::ImportValue": "Table-TableArn",
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "DeleteFunctionServiceRoleDefaultPolicy702B92CD",
+        "Roles": [
+          {
+            "Ref": "DeleteFunctionServiceRole092E9E58",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "DeleteFunctioninvokefunctionurlD24C9758": {
+      "Properties": {
+        "Action": "lambda:InvokeFunctionUrl",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "DeleteFunction9052F8B5",
+            "Arn",
+          ],
+        },
+        "FunctionUrlAuthType": "NONE",
+        "Principal": "*",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
     "GetAllFunction07A130BE": {
       "DependsOn": [
         "GetAllFunctionServiceRoleDefaultPolicyA595CA2C",
@@ -150,6 +298,136 @@ exports[`Access Stack Snapshot Test 1`] = `
         "FunctionName": {
           "Fn::GetAtt": [
             "GetAllFunction07A130BE",
+            "Arn",
+          ],
+        },
+        "FunctionUrlAuthType": "NONE",
+        "Principal": "*",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "GetByIdFunctionCCE22B29": {
+      "DependsOn": [
+        "GetByIdFunctionServiceRoleDefaultPolicyFF497EF9",
+        "GetByIdFunctionServiceRole6F865A66",
+      ],
+      "Properties": {
+        "Architectures": [
+          "arm64",
+        ],
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "PLACEHOLDER",
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Fn::ImportValue": "Table-TableName",
+            },
+          },
+        },
+        "Handler": "bootstrap",
+        "Role": {
+          "Fn::GetAtt": [
+            "GetByIdFunctionServiceRole6F865A66",
+            "Arn",
+          ],
+        },
+        "Runtime": "provided.al2023",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "GetByIdFunctionFunctionUrlE832E604": {
+      "Properties": {
+        "AuthType": "NONE",
+        "TargetFunctionArn": {
+          "Fn::GetAtt": [
+            "GetByIdFunctionCCE22B29",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Url",
+    },
+    "GetByIdFunctionServiceRole6F865A66": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "GetByIdFunctionServiceRoleDefaultPolicyFF497EF9": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::ImportValue": "Table-TableArn",
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::ImportValue": "Table-TableArn",
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "GetByIdFunctionServiceRoleDefaultPolicyFF497EF9",
+        "Roles": [
+          {
+            "Ref": "GetByIdFunctionServiceRole6F865A66",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "GetByIdFunctioninvokefunctionurlA3B9F1DE": {
+      "Properties": {
+        "Action": "lambda:InvokeFunctionUrl",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetByIdFunctionCCE22B29",
             "Arn",
           ],
         },
@@ -319,6 +597,44 @@ exports[`Access Stack Snapshot Test 1`] = `
               "/aws/lambda/",
               {
                 "Ref": "InsertFunction44D5A36F",
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": 3653,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "LogGroup34356AF39": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "",
+            [
+              "/aws/lambda/",
+              {
+                "Ref": "GetByIdFunctionCCE22B29",
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": 3653,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "LogGroup4A4E5F7C0": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "",
+            [
+              "/aws/lambda/",
+              {
+                "Ref": "DeleteFunction9052F8B5",
               },
             ],
           ],

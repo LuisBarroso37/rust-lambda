@@ -12,10 +12,8 @@ pub struct Item {
     pub age: u8,
 }
 
-/// You can see more examples in Runtime's repository:
-/// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
 #[tracing::instrument(skip(db_client), level = "info")]
-async fn handle_request(db_client: &Client) -> Result<Response<Body>, Error> {
+async fn handle_request(db_client: &Client, event: Request) -> Result<Response<Body>, Error> {
     let table_name = get_required_env_variable("TABLE_NAME");
 
     let items = get_all(db_client, &table_name).await?;
@@ -37,8 +35,8 @@ async fn main() -> Result<(), Error> {
     let aws_config = shared::get_aws_config().await;
     let client = aws_sdk_dynamodb::Client::new(&aws_config);
 
-    run(service_fn(|_event: Request| async {
-        handle_request(&client).await
+    run(service_fn(|event: Request| async {
+        handle_request(&client, event).await
     }))
     .await
 }

@@ -697,7 +697,6 @@ dependencies = [
  "serde_dynamo",
  "serde_json",
  "shared",
- "simple-error",
  "tokio",
 ]
 
@@ -1074,7 +1073,21 @@ dependencies = [
  "serde_dynamo",
  "serde_json",
  "shared",
- "simple-error",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
+name = "item"
+version = "0.1.0"
+dependencies = [
+ "aws-config",
+ "aws-sdk-dynamodb",
+ "lambda_http",
+ "serde",
+ "serde_dynamo",
+ "serde_json",
+ "shared",
  "tokio",
  "uuid",
 ]
@@ -1652,12 +1665,6 @@ checksum = "a9e9e0b4211b72e7b8b6e85c807d36c212bdb33ea8587f7569562a84df5465b1"
 dependencies = [
  "libc",
 ]
-
-[[package]]
-name = "simple-error"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e2accd2c41a0e920d2abd91b2badcfa1da784662f54fbc47e0e3a51f1e2e1cf"
 
 [[package]]
 name = "slab"

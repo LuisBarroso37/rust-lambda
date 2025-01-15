@@ -64,11 +64,51 @@ export class RustLambdaStack extends Stack {
 			removalPolicy: RemovalPolicy.RETAIN,
 		});
 
+		const getByIdFunction = new RustFunction(this, "GetByIdFunction", {
+			manifestPath: path.join(__dirname, "..", "..", "rust_lambda"),
+			binaryName: "get_by_id",
+			runtime: "provided.al2023",
+			architecture: Architecture.ARM_64,
+			environment,
+		});
+
+		getByIdFunction.addToRolePolicy(dynamodbReadPolicy);
+
+		new LogGroup(this, "LogGroup3", {
+			logGroupName: `/aws/lambda/${getByIdFunction.functionName}`,
+			retention: RetentionDays.TEN_YEARS,
+			removalPolicy: RemovalPolicy.RETAIN,
+		});
+
+		const deleteFunction = new RustFunction(this, "DeleteFunction", {
+			manifestPath: path.join(__dirname, "..", "..", "rust_lambda"),
+			binaryName: "delete",
+			runtime: "provided.al2023",
+			architecture: Architecture.ARM_64,
+			environment,
+		});
+
+		deleteFunction.addToRolePolicy(dynamodbReadWritePolicy);
+
+		new LogGroup(this, "LogGroup4", {
+			logGroupName: `/aws/lambda/${deleteFunction.functionName}`,
+			retention: RetentionDays.TEN_YEARS,
+			removalPolicy: RemovalPolicy.RETAIN,
+		});
+
 		const getAllFunctionUrl = getAllFunction.addFunctionUrl({
 			authType: FunctionUrlAuthType.NONE,
 		});
 
 		const insertFunctionUrl = insertFunction.addFunctionUrl({
+			authType: FunctionUrlAuthType.NONE,
+		});
+
+		const getByIdFunctionUrl = getByIdFunction.addFunctionUrl({
+			authType: FunctionUrlAuthType.NONE,
+		});
+
+		const deleteFunctionUrl = deleteFunction.addFunctionUrl({
 			authType: FunctionUrlAuthType.NONE,
 		});
 
@@ -78,6 +118,14 @@ export class RustLambdaStack extends Stack {
 
 		new CfnOutput(this, "InsertFunctionUrl", {
 			value: insertFunctionUrl.url,
+		});
+
+		new CfnOutput(this, "GetByIdFunctionUrl", {
+			value: getByIdFunctionUrl.url,
+		});
+
+		new CfnOutput(this, "DeleteFunctionUrl", {
+			value: deleteFunctionUrl.url,
 		});
 	}
 }

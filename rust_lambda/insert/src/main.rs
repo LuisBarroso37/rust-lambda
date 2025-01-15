@@ -13,8 +13,6 @@ pub struct Item {
     pub age: u8,
 }
 
-/// You can see more examples in Runtime's repository:
-/// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
 #[tracing::instrument(skip(db_client), level = "info")]
 async fn handle_request(db_client: &Client, event: Request) -> Result<Response<Body>, Error> {
     let table_name = get_required_env_variable("TABLE_NAME");
@@ -61,11 +59,11 @@ async fn main() -> Result<(), Error> {
 
 #[tracing::instrument(skip(client, table_name), level = "info")]
 pub async fn add_item(client: &Client, table_name: &str, item: Item) -> Result<(), Error> {
-    let user_id = Uuid::new_v4();
-    let primary_key = format!("u#{user_id}", user_id = user_id);
-    let sort_key = format!("u#{user_id}", user_id = user_id);
+    let item_id = Uuid::new_v4();
+    let partition_key = format!("u#{item_id}", item_id = item_id);
+    let sort_key = format!("u#{item_id}", item_id = item_id);
 
-    let primary_key_av = to_attribute_value(primary_key)?;
+    let partition_key_av = to_attribute_value(partition_key)?;
     let sort_key_av = to_attribute_value(sort_key)?;
     let user_av = to_attribute_value(item.username)?;
     let first_name_av = to_attribute_value(item.first_name)?;
@@ -75,7 +73,7 @@ pub async fn add_item(client: &Client, table_name: &str, item: Item) -> Result<(
     let request = client
         .put_item()
         .table_name(table_name)
-        .item("#p", primary_key_av)
+        .item("#p", partition_key_av)
         .item("#s", sort_key_av)
         .item("username", user_av)
         .item("first_name", first_name_av)

@@ -1,5 +1,5 @@
 [package]
-name = "insert"
+name = "item"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,3 +13,11 @@ aws-config = "1.5.12"
 tokio = { version = "1.42.0", features = ["macros"] }
 uuid = { version = "1.11.1", features = ["v4"] }
 shared = { path = "../shared" }
+
+[[bin]]
+name = "get_by_id"
+path = "src/bin/get_by_id.rs"
+
+[[bin]]
+name = "delete"
+path = "src/bin/delete.rs"
